@@ -1,1 +1,1 @@
-Inspiration [ qonto.com, lazerpay.finance ]
+Inspiration [ qonto.com, lazerpay.finance, silamoney.com, getwaya.com]

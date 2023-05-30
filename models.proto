@@ -1,0 +1,12 @@
+type User {
+    uint id
+    uint accountNo
+    string UserName
+    string FirstName
+    string LastName
+    uint idNo
+    uint taxPin
+    uint dob
+    uint creationDate
+    uint regDate
+}

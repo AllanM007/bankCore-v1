@@ -2,14 +2,13 @@ package main
 
 import (
 	controllers "github.com/AllanM007/bankCore-v1/controllers/users"
-	"github.com/AllanM007/bankCore-v1/initializers"
 	"github.com/gin-gonic/gin"
 )
 
 
 func init()  {
-	initializers.LoadEnvVariables()
-	initializers.ConnectToDB()
+	// initializers.LoadEnvVariables()
+	// initializers.ConnectToDB()
 }
 
 func main() {

@@ -1,0 +1,30 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: interest-cronjob
+  namespace: default
+spec:
+  schedule: "0 20 * * *" # Cron schedule (every day at 11pm)
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: curl-container
+              image: curlimages/curl:latest # Use a Docker image with curl installed
+              command:
+                [
+                  "curl",
+                  "--location",
+                  "https://api.bank.com/api/v1/payments/creditPayments",
+                ]
+              args:
+                [
+                  "--header",
+                  "Content-Type: application/x-www-form-urlencoded",
+                  "--data-urlencode",
+                  "device=Chrome",
+                  "--data-urlencode",
+                  "userId=1010",
+                ]
+          restartPolicy: OnFailure

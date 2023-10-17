@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: modsecurity-config
+  # namespace: <your-namespace>
+# data:
+#   modsecurity.conf: |
+#     SecRuleEngine On
+#     SecRequestBodyAccess On
+#     SecRule REQUEST_HEADERS:Content-Type "text/xml" \
+#          "id:'200000',phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=XML"
+#     # Add more ModSecurity rules as needed
+# data:
+#   allow-snippet-annotations: "true"
+#   enable-modsecurity: "true"
+#   enable-owasp-modsecurity-crs: "true"
+#   modsecurity-snippet: |-
+#     SecRuleEngine On
+#     SecRequestBodyAccess On
+#     SecRule ARGS|ARGS_NAMES "\.classLoader\." "log,\
+#       deny,\
+#       phase:2,\
+#       id:76000001,\
+#       severity:CRITICAL,\
+#       msg:\'Possible Spring4Shell exploitation\'"
+data:
+  allow-snippet-annotations: "true"
+  enable-modsecurity: "true"
+  enable-owasp-modsecurity-crs: "true"
+  modsecurity-snippet: |-
+    SecRuleEngine On
+    SecRequestBodyAccess On
+  modsecurity-crs: |-
+    # OWASP ModSecurity Core Rule Set (CRS) rules
+    Include /etc/nginx/modsecurity/owasp-modsecurity-crs/*.conf

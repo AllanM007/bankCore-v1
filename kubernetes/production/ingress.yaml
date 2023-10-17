@@ -1,0 +1,33 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: bankIngress
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    # nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/enable-modsecurity: "true"
+    nginx.ingress.kubernetes.io/modsecurity-configmap: "modsecurity-config"
+spec:
+  ingressClassName: nginx
+  # tls:
+  #   - hosts:
+  #       - services.mombo.live
+  #     secretName: mombo-tls
+  rules:
+    - host: api.bank.com
+      http:
+        paths:
+          - path: /healthz
+            pathType: Prefix
+            backend:
+              service:
+                name: bank-service
+                port:
+                  number: 3030
+          - path: /bank
+            pathType: Prefix
+            backend:
+              service:
+                name: goals-service
+                port:
+                  number: 3030

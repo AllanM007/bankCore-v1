@@ -1,40 +1,67 @@
 package controllers
 
 import (
-	"fmt"
-	"log"
-	"time"
+	"net/http"
+	"strings"
 
-	"github.com/AllanM007/bankCore-v1/initializers"
 	"github.com/AllanM007/bankCore-v1/models"
 	"github.com/gin-gonic/gin"
+	"github.com/jackc/pgx/v5/pgconn"
+	"gorm.io/gorm"
 )
 
+type User struct {
+	DB *gorm.DB
+}
 
+func UserRepo(db *gorm.DB) *User {
+	db.AutoMigrate()
 
-func UserRegistration( c *gin.Context)  {
+	return &User{DB : db}
+}
 
-	//create a user
-	user := models.User{
-		Id: 101,
-        AccountNo: 18,	
-		FirstName: "Jinzhu",
-		LastName: "Hawaii",
-		IdNo: 293728,
-		CreatedOn: time.Now(),
+type Member struct {
+	Id                uint64         `json:"id"         binding:"required"`
+	FirstName         string         `json:"firstName"  binding:"required"`
+	MiddleName        string         `json:"middleName" binding:"required"`
+	LastName          string         `json:"lastName"   binding:"required"`
+	Email             string         `json:"email"      binding:"required"`
+	KraPin            string         `json:"kraPin"     binding:"required"` 
+	IdNo              uint64         `json:"idNo"       binding:"required"`
+	Gender            string         `json:"gender"     binding:"required"`
+}
+
+func (repository *User)UserRegistration( c *gin.Context)  {
+
+	var member Member
+
+	if err := c.BindJSON(&member) ; err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"status":"BAD_REQUEST", "message":"Invalid Request!!", "error": err.Error()})
+		return
+	}
+
+	newMember := &models.User{
+		
 	}
 		
     // pass pointer of data to Create
-	result := initializers.DB.Create(&user)
-	
-	if result.Error != nil {
-		c.JSON(500, gin.H{"Messge":"Internal Server Error While Adding User"})
-		log.Fatal(result.Error)
+	result := models.CreateUser(repository.DB, *newMember)
+	if result != nil {
+
+		if strings.Contains(result.(*pgconn.PgError).Message, "duplicate key value violates unique constraint") {
+			c.AbortWithStatusJSON(http.StatusConflict, gin.H{"error": "Duplicate conflict while creating parent account","status":"DUPLICATE_ENTITY"})
+			return
+		} else {
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": result.Error()})
+			return
+		}
 	}
 	
-	fmt.Println(user.ID)// returns inserted data's primary key
+	// if result.Error != nil {
+	// 	c.JSON(500, gin.H{"Messge":"Internal Server Error While Adding User"})
+	// 	log.Fatal(result.Error)
+	// }
+		
 	
-	fmt.Println(result.RowsAffected) // returns inserted records count
-	
-	c.JSON(200, gin.H{"user": user, "status": "SUCCESS"})
+	c.JSON(http.StatusCreated, gin.H{"status": "SUCCESS", "message": "User created succesfully!!"})
 }
